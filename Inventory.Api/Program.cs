@@ -22,6 +22,8 @@ builder.Services.AddScoped<Inventory.Application.Interface.IProductService, Inve
 builder.Services.AddScoped<Inventory.Application.Interface.ISupplierService, Inventory.Application.Service.SupplierService>();
 builder.Services.AddScoped<Inventory.Application.Interface.IProductClassificationRepository, Inventory.Infrastructure.Repositories.ProductClassificationRepository>();
 builder.Services.AddScoped<Inventory.Application.Service.IProductClassificationService, Inventory.Application.Service.ProductClassificationService>();
+builder.Services.AddScoped<Inventory.Application.Interface.ITaxRepository, Inventory.Infrastructure.Repositories.TaxRepository>();
+builder.Services.AddScoped<Inventory.Application.Service.ITaxService, Inventory.Application.Service.TaxService>();
 
 builder.Services.AddControllers();
 
