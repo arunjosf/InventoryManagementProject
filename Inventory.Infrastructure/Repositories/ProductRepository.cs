@@ -34,6 +34,28 @@ namespace Inventory.Infrastructure.Repositories
             return product;
         }
 
+        public async Task<Product> AddProductWithStockAsync(Product product, InventoryStock initialStock)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                _context.Products.Add(product);
+                await _context.SaveChangesAsync();
+
+                initialStock.ProductId = product.Id;
+                _context.InventoryStocks.Add(initialStock);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return product;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
         public async Task UpdateAsync(Product product)
         {
             _context.Products.Update(product);

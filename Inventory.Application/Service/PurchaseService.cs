@@ -74,18 +74,14 @@ namespace Inventory.Application.Service
                 if (!product.IsActive)
                     return new ApiResponse<int>(false, $"Product {product.Name} is inactive and cannot be purchased.", 0);
 
-                if (product.IsLotTrackingEnabled && string.IsNullOrWhiteSpace(itemReq.LotNumber))
+                if (string.IsNullOrWhiteSpace(itemReq.LotNumber))
                     return new ApiResponse<int>(false, $"Lot Number is mandatory for product {product.Name}.", 0);
 
-                var compareDate = request.InvoiceDate ?? DateTime.UtcNow;
-                if (product.IsExpiryTrackingEnabled)
-                {
-                    if (!itemReq.ExpiryDate.HasValue)
-                        return new ApiResponse<int>(false, $"Expiry Date is mandatory for product {product.Name}.", 0);
-
-                    if (itemReq.ExpiryDate.Value.Date <= compareDate.Date)
-                        return new ApiResponse<int>(false, $"Product {product.Name} (Lot {itemReq.LotNumber}) is expired and cannot be accepted.", 0);
-                }
+                var compareDate = request.InvoiceDate;
+                
+                // Expiry date is now mandatory in DTO, but ensure it's not default/invalid
+                if (itemReq.ExpiryDate == default || itemReq.ExpiryDate.Date <= compareDate.Date)
+                    return new ApiResponse<int>(false, $"Product {product.Name} (Lot {itemReq.LotNumber}) is expired or has an invalid expiry date and cannot be accepted.", 0);
 
                 var lineItem = new PurchaseItem
                 {

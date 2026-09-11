@@ -12,6 +12,7 @@ namespace Inventory.Application.Interface
         Task<Product?> GetProductWithTaxesAsync(int id);
         Task<Product?> GetByIdAsync(int id);
         Task<Product> AddAsync(Product product);
+        Task<Product> AddProductWithStockAsync(Product product, InventoryStock initialStock);
         Task UpdateAsync(Product product);
         Task<(IEnumerable<Product> Products, int TotalCount)> GetAllAsync(int pageNumber, int pageSize);
     }

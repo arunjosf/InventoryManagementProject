@@ -21,9 +21,6 @@ namespace Inventory.Domain.Model
 
         public bool IsActive { get; set; }
 
-        public bool IsLotTrackingEnabled { get; set; }
-        public bool IsExpiryTrackingEnabled { get; set; }
-
         public ICollection<ProductTax> ProductTaxes { get; set; } = new List<ProductTax>();
 
         public ICollection<PurchaseItem> PurchaseItems { get; set; }

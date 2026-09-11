@@ -37,6 +37,14 @@ namespace Inventory.Api.Controllers
             return Ok(result);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateProductDto dto)
+        {
+            var result = await _service.UpdateAsync(id, dto);
+            if (!result.Success) return NotFound(result);
+            return Ok(result);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

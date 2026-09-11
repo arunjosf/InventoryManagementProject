@@ -21,13 +21,24 @@ namespace Inventory.Infrastructure.Repositories
         public async Task<IEnumerable<InventoryStock>> GetAvailableFifoStockAsync(int productId)
         {
             var currentDate = DateTime.UtcNow.Date;
-
             return await _context.InventoryStocks
-                .Where(s => s.ProductId == productId && s.AvailableQuantity > 0 &&
-                            (!s.ExpiryDate.HasValue || s.ExpiryDate.Value.Date > currentDate))
-                .OrderBy(s => s.ExpiryDate ?? DateTime.MaxValue)
-                .ThenBy(s => s.Id)
+                .Where(x => x.ProductId == productId && x.AvailableQuantity > 0 && (!x.ExpiryDate.HasValue || x.ExpiryDate.Value.Date > currentDate))
+                .OrderBy(x => x.ExpiryDate ?? DateTime.MaxValue)
+                .ThenBy(x => x.Id)
                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<InventoryStock>> GetStockByProductIdAsync(int productId)
+        {
+            return await _context.InventoryStocks
+                .Where(x => x.ProductId == productId)
+                .ToListAsync();
+        }
+
+        public async Task AddStockAsync(InventoryStock stock)
+        {
+            _context.InventoryStocks.Add(stock);
+            await _context.SaveChangesAsync();
         }
     }
 }
