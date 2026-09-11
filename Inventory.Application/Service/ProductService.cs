@@ -20,7 +20,7 @@ namespace Inventory.Application.Service
 
         public async Task<ApiResponse<ProductDto>> GetByIdAsync(int id)
         {
-            var p = await _productRepo.GetByIdAsync(id);
+            var p = await _productRepo.GetProductWithTaxesAsync(id);
             if (p == null) return new ApiResponse<ProductDto>(false, "Not found", null);
 
             var stocks = (await _inventoryRepo.GetStockByProductIdAsync(id)).ToList();
@@ -35,7 +35,8 @@ namespace Inventory.Application.Service
                 SellingPrice = p.SellingPrice,
                 IsActive = p.IsActive,
                 TotalAvailableStock = stocks.Sum(x => x.AvailableQuantity),
-                HasExpiredStock = isExpired
+                HasExpiredStock = isExpired,
+                TaxIds = p.ProductTaxes?.Select(pt => pt.TaxId).ToList() ?? new System.Collections.Generic.List<int>()
             };
             return new ApiResponse<ProductDto>(true, "Success", dto);
         }
@@ -47,6 +48,7 @@ namespace Inventory.Application.Service
             var dtos = new System.Collections.Generic.List<ProductDto>();
             foreach (var p in products)
             {
+                var pWithTaxes = await _productRepo.GetProductWithTaxesAsync(p.Id);
                 var stocks = (await _inventoryRepo.GetStockByProductIdAsync(p.Id)).ToList();
                 var isExpired = stocks.Any() && stocks.Where(x => x.AvailableQuantity > 0).All(x => x.ExpiryDate.HasValue && x.ExpiryDate.Value.Date < DateTime.UtcNow.Date);
                 
@@ -59,7 +61,8 @@ namespace Inventory.Application.Service
                     SellingPrice = p.SellingPrice,
                     IsActive = p.IsActive,
                     TotalAvailableStock = stocks.Sum(x => x.AvailableQuantity),
-                    HasExpiredStock = isExpired
+                    HasExpiredStock = isExpired,
+                    TaxIds = pWithTaxes?.ProductTaxes?.Select(pt => pt.TaxId).ToList() ?? new System.Collections.Generic.List<int>()
                 });
             }
             
@@ -75,7 +78,8 @@ namespace Inventory.Application.Service
                 ProductClassificationId = dto.ProductClassificationId,
                 PurchasePrice = dto.PurchasePrice,
                 SellingPrice = dto.SellingPrice,
-                IsActive = true
+                IsActive = true,
+                ProductTaxes = dto.TaxIds?.Select(t => new ProductTax { TaxId = t }).ToList() ?? new System.Collections.Generic.List<ProductTax>()
             };
 
             var initialStock = new InventoryStock
@@ -91,13 +95,22 @@ namespace Inventory.Application.Service
 
         public async Task<ApiResponse> UpdateAsync(int id, UpdateProductDto dto)
         {
-            var p = await _productRepo.GetByIdAsync(id);
+            var p = await _productRepo.GetProductWithTaxesAsync(id);
             if (p == null) return new ApiResponse(false, "Not found");
 
             p.Name = dto.Name;
             p.SKU = dto.SKU;
             p.PurchasePrice = dto.PurchasePrice;
             p.SellingPrice = dto.SellingPrice;
+
+            p.ProductTaxes.Clear();
+            if (dto.TaxIds != null && dto.TaxIds.Any())
+            {
+                foreach (var t in dto.TaxIds)
+                {
+                    p.ProductTaxes.Add(new ProductTax { ProductId = id, TaxId = t });
+                }
+            }
 
             await _productRepo.UpdateAsync(p);
             return new ApiResponse(true, "Updated successfully");

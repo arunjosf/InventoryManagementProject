@@ -15,6 +15,8 @@ namespace Inventory.Application.DTOS
         // Stock summary properties
         public int TotalAvailableStock { get; set; }
         public bool HasExpiredStock { get; set; }
+
+        public System.Collections.Generic.List<int> TaxIds { get; set; } = new();
     }
 
     public class CreateProductDto
@@ -48,6 +50,8 @@ namespace Inventory.Application.DTOS
 
         [Required]
         public DateTime InitialExpiryDate { get; set; }
+
+        public System.Collections.Generic.List<int> TaxIds { get; set; } = new();
     }
 
     public class UpdateProductDto
@@ -65,5 +69,7 @@ namespace Inventory.Application.DTOS
 
         [Range(0.01, double.MaxValue, ErrorMessage = "Selling price must be greater than 0")]
         public decimal SellingPrice { get; set; }
+
+        public System.Collections.Generic.List<int> TaxIds { get; set; } = new();
     }
 }
