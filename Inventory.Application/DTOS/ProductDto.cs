@@ -8,6 +8,8 @@ namespace Inventory.Application.DTOS
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string SKU { get; set; } = null!;
+        public int ProductClassificationId { get; set; }
+        public string? ClassificationName { get; set; }
         public decimal PurchasePrice { get; set; }
         public decimal SellingPrice { get; set; }
         public bool IsActive { get; set; }

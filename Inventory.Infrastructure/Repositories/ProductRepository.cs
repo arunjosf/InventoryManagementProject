@@ -18,6 +18,7 @@ namespace Inventory.Infrastructure.Repositories
         public async Task<Product?> GetProductWithTaxesAsync(int id)
         {
             return await _context.Products
+                .Include(p => p.ProductClassification)
                 .Include(p => p.ProductTaxes).ThenInclude(pt => pt.Tax)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
@@ -64,7 +65,7 @@ namespace Inventory.Infrastructure.Repositories
 
         public async Task<(System.Collections.Generic.IEnumerable<Product> Products, int TotalCount)> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Products.AsNoTracking();
+            var query = _context.Products.AsNoTracking().Include(p => p.ProductClassification);
             var totalCount = await query.CountAsync();
             var products = await query
                 .OrderBy(p => p.Id)
