@@ -6,6 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), 
         b => b.MigrationsAssembly("Inventory.Infrastructure")));
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 // Add services to the container.
 builder.Services.AddScoped<Inventory.Application.Interface.IPurchaseRepository, Inventory.Infrastructure.Repositories.PurchaseRepository>();
 builder.Services.AddScoped<Inventory.Application.Interface.IInventoryRepository, Inventory.Infrastructure.Repositories.InventoryRepository>();

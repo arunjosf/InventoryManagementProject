@@ -10,7 +10,6 @@ namespace Inventory.Application.Service
     {
         Task<ApiResponse<int>> CreateAsync(CreateProductClassificationDto dto);
         Task<ApiResponse<object>> GetAllAsync();
-        Task<ApiResponse<object>> GetDropdownAsync();
     }
 
     public class ProductClassificationService : IProductClassificationService
@@ -28,7 +27,8 @@ namespace Inventory.Application.Service
             {
                 Name = dto.Name,
                 Code = dto.Code,
-                ParentClassificationId = dto.ParentClassificationId
+                // Ensure 0 is converted to null to avoid FK constraint errors
+                ParentClassificationId = dto.ParentClassificationId > 0 ? dto.ParentClassificationId : null
             };
             await _repo.AddAsync(classification);
             return new ApiResponse<int>(true, "Created", classification.Id);
@@ -36,20 +36,16 @@ namespace Inventory.Application.Service
 
         public async Task<ApiResponse<object>> GetAllAsync()
         {
-            var items = await _repo.GetAllAsync();
-            var dtos = items.Select(i => new { i.Id, i.Name, i.Code, i.ParentClassificationId });
-            return new ApiResponse<object>(true, "Success", dtos);
-        }
-
-        public async Task<ApiResponse<object>> GetDropdownAsync()
-        {
             var items = (await _repo.GetAllAsync()).ToList();
             
             var dtos = items.Select(i => new 
             {
                 Id = i.Id,
-                Label = BuildCategoryPath(i, items)
-            }).OrderBy(x => x.Label).ToList();
+                Name = i.Name,
+                Code = i.Code,
+                ParentClassificationId = i.ParentClassificationId,
+                DropdownLabel = BuildCategoryPath(i, items)
+            }).OrderBy(x => x.DropdownLabel).ToList();
 
             return new ApiResponse<object>(true, "Success", dtos);
         }

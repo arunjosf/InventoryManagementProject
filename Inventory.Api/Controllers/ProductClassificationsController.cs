@@ -22,12 +22,6 @@ namespace Inventory.Api.Controllers
             return Ok(await _service.GetAllAsync());
         }
 
-        [HttpGet("dropdown")]
-        public async Task<IActionResult> GetDropdown()
-        {
-            return Ok(await _service.GetDropdownAsync());
-        }
-
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateProductClassificationDto dto)
         {
