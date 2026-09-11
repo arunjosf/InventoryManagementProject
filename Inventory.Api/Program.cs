@@ -24,6 +24,24 @@ builder.Services.AddScoped<Inventory.Application.Interface.IProductClassificatio
 builder.Services.AddScoped<Inventory.Application.Service.IProductClassificationService, Inventory.Application.Service.ProductClassificationService>();
 
 builder.Services.AddControllers();
+
+// Standardize model validation errors to our custom ApiResponse wrapper
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(e => e.Value.Errors.Count > 0)
+            .SelectMany(kvp => kvp.Value.Errors.Select(e => e.ErrorMessage))
+            .ToList();
+
+        var message = "Validation Failed: " + string.Join(" | ", errors);
+        
+        var response = new Inventory.Application.DTOS.ApiResponse(false, message);
+        return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(response);
+    };
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(options =>
