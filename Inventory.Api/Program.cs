@@ -56,6 +56,31 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Automatically seed Taxes and initial data if not present
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        
+        if (!context.Taxes.Any())
+        {
+            context.Taxes.AddRange(
+                new Inventory.Domain.Model.Tax { Name = "GST 5%", Percentage = 5.00m, IsActive = true, IsCompound = false },
+                new Inventory.Domain.Model.Tax { Name = "GST 12%", Percentage = 12.00m, IsActive = true, IsCompound = false },
+                new Inventory.Domain.Model.Tax { Name = "GST 18%", Percentage = 18.00m, IsActive = true, IsCompound = false },
+                new Inventory.Domain.Model.Tax { Name = "GST 28%", Percentage = 28.00m, IsActive = true, IsCompound = false },
+                new Inventory.Domain.Model.Tax { Name = "Standard VAT 10%", Percentage = 10.00m, IsActive = true, IsCompound = false }
+            );
+            context.SaveChanges();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Database seeding notice: {ex.Message}");
+    }
+}
+
 app.UseCors();
 
 app.UseMiddleware<Inventory.Api.Middleware.ExceptionHandlingMiddleware>();
