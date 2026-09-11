@@ -10,6 +10,7 @@ namespace Inventory.Application.Service
     {
         Task<ApiResponse<int>> CreateAsync(CreateProductClassificationDto dto);
         Task<ApiResponse<object>> GetAllAsync();
+        Task<ApiResponse<object>> GetDropdownAsync();
     }
 
     public class ProductClassificationService : IProductClassificationService
@@ -38,6 +39,31 @@ namespace Inventory.Application.Service
             var items = await _repo.GetAllAsync();
             var dtos = items.Select(i => new { i.Id, i.Name, i.Code, i.ParentClassificationId });
             return new ApiResponse<object>(true, "Success", dtos);
+        }
+
+        public async Task<ApiResponse<object>> GetDropdownAsync()
+        {
+            var items = (await _repo.GetAllAsync()).ToList();
+            
+            var dtos = items.Select(i => new 
+            {
+                Id = i.Id,
+                Label = BuildCategoryPath(i, items)
+            }).OrderBy(x => x.Label).ToList();
+
+            return new ApiResponse<object>(true, "Success", dtos);
+        }
+
+        private string BuildCategoryPath(ProductClassification item, System.Collections.Generic.List<ProductClassification> allItems)
+        {
+            if (item.ParentClassificationId == null)
+                return item.Name;
+            
+            var parent = allItems.FirstOrDefault(p => p.Id == item.ParentClassificationId);
+            if (parent == null)
+                return item.Name;
+                
+            return $"{BuildCategoryPath(parent, allItems)} > {item.Name}";
         }
     }
 }

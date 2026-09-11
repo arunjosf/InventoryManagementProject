@@ -28,6 +28,14 @@ namespace Inventory.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ProductClassification>().HasData(
+                new ProductClassification { Id = 1, Name = "Electronics", Code = "ELEC", ParentClassificationId = null },
+                new ProductClassification { Id = 2, Name = "Mobile Phones", Code = "MOB", ParentClassificationId = 1 },
+                new ProductClassification { Id = 3, Name = "Laptops", Code = "LAP", ParentClassificationId = 1 },
+                new ProductClassification { Id = 4, Name = "Groceries", Code = "GROC", ParentClassificationId = null },
+                new ProductClassification { Id = 5, Name = "Beverages", Code = "BEV", ParentClassificationId = 4 }
+            );
+
             // Product
             modelBuilder.Entity<Product>()
                 .HasIndex(x => x.SKU)
