@@ -32,7 +32,17 @@ namespace Inventory.Api.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            var response = new ApiResponse(false, $"An unexpected error occurred: {exception.Message}");
+            var message = exception.Message;
+            if (exception.InnerException != null)
+            {
+                message = $"{exception.Message} - Details: {exception.InnerException.Message}";
+                if (exception.InnerException.InnerException != null)
+                {
+                    message += $" ({exception.InnerException.InnerException.Message})";
+                }
+            }
+
+            var response = new ApiResponse(false, $"An unexpected error occurred: {message}");
             
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var jsonResponse = JsonSerializer.Serialize(response, options);

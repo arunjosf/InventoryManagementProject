@@ -89,8 +89,8 @@ namespace Inventory.Application.Service
                     Quantity = itemReq.Quantity,
                     UnitPrice = itemReq.UnitPrice,
                     DiscountAmount = itemReq.DiscountAmount,
-                    LotNumber = itemReq.LotNumber,
-                    ExpiryDate = itemReq.ExpiryDate,
+                    LotNumber = itemReq.LotNumber.Trim(),
+                    ExpiryDate = itemReq.ExpiryDate.Date,
                     Taxes = new List<PurchaseItemTax>()
                 };
 
@@ -103,7 +103,7 @@ namespace Inventory.Application.Service
                 {
                     if (prodTax.Tax.IsActive)
                     {
-                        var calculatedTax = lineTotalBeforeTax * (prodTax.Tax.Percentage / 100);
+                        var calculatedTax = Math.Round(lineTotalBeforeTax * (prodTax.Tax.Percentage / 100m), 2);
                         
                         lineItem.Taxes.Add(new PurchaseItemTax
                         {

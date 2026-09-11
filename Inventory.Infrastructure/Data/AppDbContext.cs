@@ -36,6 +36,14 @@ namespace Inventory.Infrastructure.Data
                 new ProductClassification { Id = 5, Name = "Beverages", Code = "BEV", ParentClassificationId = 4 }
             );
 
+            modelBuilder.Entity<Tax>().HasData(
+                new Tax { Id = 1, Name = "GST 5%", Percentage = 5.00m, IsActive = true, IsCompound = false },
+                new Tax { Id = 2, Name = "GST 12%", Percentage = 12.00m, IsActive = true, IsCompound = false },
+                new Tax { Id = 3, Name = "GST 18%", Percentage = 18.00m, IsActive = true, IsCompound = false },
+                new Tax { Id = 4, Name = "GST 28%", Percentage = 28.00m, IsActive = true, IsCompound = false },
+                new Tax { Id = 5, Name = "Standard VAT 10%", Percentage = 10.00m, IsActive = true, IsCompound = false }
+            );
+
             // Product
             modelBuilder.Entity<Product>()
                 .HasIndex(x => x.SKU)

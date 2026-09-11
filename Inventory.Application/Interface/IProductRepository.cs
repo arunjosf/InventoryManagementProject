@@ -15,5 +15,8 @@ namespace Inventory.Application.Interface
         Task<Product> AddProductWithStockAsync(Product product, InventoryStock initialStock);
         Task UpdateAsync(Product product);
         Task<(IEnumerable<Product> Products, int TotalCount)> GetAllAsync(int pageNumber, int pageSize);
+        Task<bool> SkuExistsAsync(string sku, int? excludeId = null);
+        Task<bool> ClassificationExistsAsync(int classificationId);
+        Task<List<int>> GetValidTaxIdsAsync(IEnumerable<int> taxIds);
     }
 }
